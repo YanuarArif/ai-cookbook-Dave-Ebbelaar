@@ -11,7 +11,7 @@ https://platform.openai.com/docs/guides/conversation-state?api-mode=responses
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="deepseek-flash-mini",
+    model="deepseek-flash",
     input=[
         {"role": "user", "content": "knock knock."},
         {"role": "assistant", "content": "Who's there?"},
@@ -28,9 +28,7 @@ print(response.output_text)
 
 history = [{"role": "user", "content": "tell me a joke"}]
 
-response = client.responses.create(
-    model="deepseek-flash-mini", input=history, store=False
-)
+response = client.responses.create(model="deepseek-flash", input=history, store=False)
 
 print(response.output_text)
 
@@ -42,7 +40,7 @@ history += [
 history.append({"role": "user", "content": "tell me another"})
 
 second_response = client.responses.create(
-    model="deepseek-flash-mini", input=history, store=False
+    model="deepseek-flash", input=history, store=False
 )
 
 print(second_response.output_text)
@@ -52,13 +50,13 @@ print(second_response.output_text)
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="deepseek-flash-mini",
+    model="deepseek-flash",
     input="tell me a joke",
 )
 print(response.output_text)
 
 second_response = client.responses.create(
-    model="deepseek-flash-mini",
+    model="deepseek-flash",
     previous_response_id=response.id,
     input=[{"role": "user", "content": "explain why this is funny."}],
 )

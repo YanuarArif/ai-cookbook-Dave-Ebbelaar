@@ -39,7 +39,7 @@ That gives you (query, relevant_doc) pairs without any human labelers. Good enou
    Question:
    ```
 
-   Run this in a batch with `deepseek-flash-mini` or similar. Save each `(query_id, query_text, source_doc_id)` triple.
+   Run this in a batch with `deepseek-flash` or similar. Save each `(query_id, query_text, source_doc_id)` triple.
 
 3. **Write the three parquet files** in BEIR schema. The qrels file is the simplest: each row is `(query_id, source_doc_id, 1)`.
 
@@ -53,7 +53,7 @@ The eval set is biased by the LLM that generated the queries. The absolute NDCG@
 
 ## Practical sizing
 
-| Scale                 | Queries to generate | Cost (deepseek-flash-mini @ $0.15/1M input, $0.60/1M output) |
+| Scale                 | Queries to generate | Cost (deepseek-flash @ $0.15/1M input, $0.60/1M output) |
 | --------------------- | ------------------- | ---------------------------------------------------- |
 | Quick sanity check    | 50                  | <$0.01                                               |
 | Useful for comparison | 100-200             | ~$0.05                                               |

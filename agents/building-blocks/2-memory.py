@@ -12,7 +12,7 @@ client = OpenAI()
 
 def ask_joke_without_memory():
     response = client.responses.create(
-        model="deepseek-flash-mini",
+        model="deepseek-flash",
         input=[
             {"role": "user", "content": "Tell me a joke about programming"},
         ],
@@ -22,7 +22,7 @@ def ask_joke_without_memory():
 
 def ask_followup_without_memory():
     response = client.responses.create(
-        model="deepseek-flash-mini",
+        model="deepseek-flash",
         input=[
             {"role": "user", "content": "What was my previous question?"},
         ],
@@ -32,7 +32,7 @@ def ask_followup_without_memory():
 
 def ask_followup_with_memory(joke_response: str):
     response = client.responses.create(
-        model="deepseek-flash-mini",
+        model="deepseek-flash",
         input=[
             {"role": "user", "content": "Tell me a joke about programming"},
             {"role": "assistant", "content": joke_response},

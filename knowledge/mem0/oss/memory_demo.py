@@ -30,7 +30,7 @@ def chat_with_memories(message: str, user_id: str = "default_user") -> str:
         {"role": "user", "content": message},
     ]
     response = openai_client.chat.completions.create(
-        model="deepseek-flash-mini", messages=messages
+        model="deepseek-flash", messages=messages
     )
     assistant_response = response.choices[0].message.content
 

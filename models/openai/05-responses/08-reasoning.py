@@ -12,7 +12,7 @@ format '[1,2],[3,4],[5,6]' and prints the transpose in the same format.
 """
 
 response = client.responses.create(
-    model="o3-mini",
+    model="deepseek-flash",
     reasoning={"effort": "medium"},
     input=[{"role": "user", "content": prompt}],
 )

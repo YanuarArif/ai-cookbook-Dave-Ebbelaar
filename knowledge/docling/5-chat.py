@@ -80,7 +80,7 @@ def get_chat_response(messages, context: str) -> str:
 
     # Create the streaming response
     stream = client.chat.completions.create(
-        model="deepseek-flash-mini",
+        model="deepseek-flash",
         messages=messages_with_context,
         temperature=0.7,
         stream=True,

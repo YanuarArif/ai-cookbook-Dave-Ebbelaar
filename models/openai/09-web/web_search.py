@@ -3,7 +3,7 @@ from openai import OpenAI
 client = OpenAI()
 
 response = client.responses.create(
-    model="gpt-5-mini",
+    model="deepseek-flash",
     reasoning={"effort": "low"},
     tools=[
         {
