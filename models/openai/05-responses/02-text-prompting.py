@@ -22,7 +22,7 @@ The list of roles can now be:
 """
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     instructions="Talk like a pirate.",
     input="Are semicolons optional in JavaScript?",
 )
@@ -35,7 +35,7 @@ print(response.output_text)
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input=[
         {"role": "developer", "content": "Talk like a pirate."},
         {"role": "user", "content": "Are semicolons optional in JavaScript?"},
@@ -53,7 +53,7 @@ https://model-spec.openai.com/2025-02-12.html#chain_of_command
 """
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input=[
         {"role": "system", "content": "Talk like a pirate."},
         {"role": "developer", "content": "don't talk like a pirate."},
@@ -64,7 +64,7 @@ response = client.responses.create(
 print(response.output_text)  # talks like a pirate
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input=[
         {"role": "system", "content": "Don't talk like a pirate."},
         {"role": "developer", "content": "Talk like a pirate."},

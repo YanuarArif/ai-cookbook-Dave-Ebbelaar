@@ -57,7 +57,7 @@ messages = [
 ]
 
 completion = client.chat.completions.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     messages=messages,
     tools=tools,
 )
@@ -103,7 +103,7 @@ class WeatherResponse(BaseModel):
 
 
 completion_2 = client.beta.chat.completions.parse(
-    model="gpt-4o",
+    model="deepseek-flash",
     messages=messages,
     tools=tools,
     response_format=WeatherResponse,

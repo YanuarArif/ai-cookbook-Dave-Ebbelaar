@@ -7,6 +7,7 @@ More info: https://platform.openai.com/docs/guides/function-calling?api-mode=res
 """
 
 import json
+
 import requests
 from openai import OpenAI
 
@@ -50,7 +51,7 @@ def intelligence_with_tools(prompt: str) -> str:
 
     # Step 1: Call model with tools
     response = client.responses.create(
-        model="gpt-4o",
+        model="deepseek-flash",
         input=input_messages,
         tools=tools,
     )
@@ -75,7 +76,7 @@ def intelligence_with_tools(prompt: str) -> str:
 
     # Step 5: Get final response with function results
     final_response = client.responses.create(
-        model="gpt-4o",
+        model="deepseek-flash",
         input=input_messages,
         tools=tools,
     )

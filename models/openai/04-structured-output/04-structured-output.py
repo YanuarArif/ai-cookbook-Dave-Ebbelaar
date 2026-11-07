@@ -1,5 +1,5 @@
-from enum import Enum
 import json
+from enum import Enum
 
 import requests
 from bs4 import BeautifulSoup
@@ -7,7 +7,7 @@ from openai import OpenAI
 from pydantic import BaseModel, Field
 
 client = OpenAI()
-MODEL = "gpt-4o-2024-08-06"
+MODEL = "deepseek-flash-2024-08-06"
 
 
 query = """

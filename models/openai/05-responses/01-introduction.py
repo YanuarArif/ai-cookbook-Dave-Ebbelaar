@@ -11,7 +11,7 @@ https://platform.openai.com/docs/api-reference/responses
 # --------------------------------------------------------------
 
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     messages=[
         {
             "role": "user",
@@ -28,7 +28,7 @@ print(response.choices[0].message.content)
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="gpt-4o", input="Write a one-sentence bedtime story about a unicorn."
+    model="deepseek-flash", input="Write a one-sentence bedtime story about a unicorn."
 )
 
 print(response.output_text)
@@ -38,7 +38,7 @@ print(response.output_text)
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input=[
         {"role": "user", "content": "what teams are playing in this image?"},
         {
@@ -60,7 +60,7 @@ print(response.output_text)
 # --------------------------------------------------------------
 
 stream = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input="Say 'double bubble bath' ten times fast.",
     stream=True,
 )

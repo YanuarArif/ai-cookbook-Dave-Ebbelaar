@@ -17,7 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 client = AsyncOpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
-model = "gpt-4o"
+model = "deepseek-flash"
 
 # --------------------------------------------------------------
 # Step 1: Define validation models

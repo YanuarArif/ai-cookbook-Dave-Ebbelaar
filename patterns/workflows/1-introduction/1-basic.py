@@ -6,7 +6,7 @@ client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
 
 
 completion = client.chat.completions.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     messages=[
         {"role": "system", "content": "You're a helpful assistant."},
         {

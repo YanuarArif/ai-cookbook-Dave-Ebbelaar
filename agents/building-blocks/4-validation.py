@@ -22,7 +22,7 @@ class TaskResult(BaseModel):
 def structured_intelligence(prompt: str) -> TaskResult:
     client = OpenAI()
     response = client.responses.parse(
-        model="gpt-4o",
+        model="deepseek-flash",
         input=[
             {
                 "role": "system",

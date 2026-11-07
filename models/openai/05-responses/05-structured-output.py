@@ -11,7 +11,7 @@ client = OpenAI()
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input=[
         {"role": "system", "content": "Extract the event information."},
         {
@@ -56,7 +56,7 @@ class CalendarEvent(BaseModel):
 
 
 response = client.responses.parse(
-    model="gpt-4o",
+    model="deepseek-flash",
     input="Alice and Bob are going to a science fair on Friday",
     instructions="Extract the event information",
     text_format=CalendarEvent,

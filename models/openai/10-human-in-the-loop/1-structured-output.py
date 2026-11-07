@@ -12,9 +12,10 @@ Run: python 1-structured-output.py
 """
 
 from typing import Literal, Self
+
+from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel, model_validator
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -94,7 +95,7 @@ print(confirmation_example.model_dump_json(indent=2))
 def run_with_confirmation(prompt: str) -> str:
     # Step 1: Analyze request and create action plan
     response = client.responses.parse(
-        model="gpt-4o",
+        model="deepseek-flash",
         instructions=(
             "You are a banking assistant. Analyze the user request and create a list of actions. "
             "Use 'check_balance' for balance inquiries, 'transfer' for money transfers, "

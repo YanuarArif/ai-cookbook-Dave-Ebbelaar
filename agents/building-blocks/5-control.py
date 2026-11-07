@@ -3,9 +3,10 @@ Control: Provides deterministic decision-making and process flow control.
 This component handles if/then logic, routing based on conditions, and process orchestration for predictable behavior.
 """
 
+from typing import Literal
+
 from openai import OpenAI
 from pydantic import BaseModel
-from typing import Literal
 
 
 class IntentClassification(BaseModel):
@@ -17,7 +18,7 @@ class IntentClassification(BaseModel):
 def route_based_on_intent(user_input: str) -> tuple[str, IntentClassification]:
     client = OpenAI()
     response = client.responses.parse(
-        model="gpt-4o",
+        model="deepseek-flash",
         input=[
             {
                 "role": "system",
@@ -46,7 +47,7 @@ def route_based_on_intent(user_input: str) -> tuple[str, IntentClassification]:
 def answer_question(question: str) -> str:
     client = OpenAI()
     response = client.responses.create(
-        model="gpt-4o", input=f"Answer this question: {question}"
+        model="deepseek-flash", input=f"Answer this question: {question}"
     )
     return response.output[0].content[0].text
 

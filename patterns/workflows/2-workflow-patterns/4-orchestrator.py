@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
-model = "gpt-4o-mini"
+model = "deepseek-flash-mini"
 
 # --------------------------------------------------------------
 # Step 1: Define the data models

@@ -8,7 +8,7 @@ client = OpenAI()
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     tools=[
         {
             "type": "web_search_preview",
@@ -24,7 +24,7 @@ print(response.output_text)
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     tools=[
         {
             "type": "web_search_preview",

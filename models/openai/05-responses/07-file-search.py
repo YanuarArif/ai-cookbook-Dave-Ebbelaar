@@ -1,7 +1,8 @@
-import requests
-from io import BytesIO
-from openai import OpenAI
 import textwrap
+from io import BytesIO
+
+import requests
+from openai import OpenAI
 
 client = OpenAI()
 
@@ -72,7 +73,7 @@ so you can include only one vector store ID when calling the file search tool.
 """
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input="What is deep research by OpenAI?",
     tools=[{"type": "file_search", "vector_store_ids": [vector_store.id]}],
 )
@@ -84,7 +85,7 @@ print(textwrap.fill(response.output_text, width=80))
 # --------------------------------------------------------------
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input="What is deep research by OpenAI?",
     tools=[
         {

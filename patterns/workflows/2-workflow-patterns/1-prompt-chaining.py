@@ -23,7 +23,9 @@ import logging  # Untuk mencatat riwayat eksekusi (log) ke terminal/layar
 import os  # Untuk berinteraksi dengan sistem operasi (misal: membaca environment variable)
 import sys  # Untuk konfigurasi sistem dan encoding output terminal
 from datetime import datetime  # Untuk mengambil tanggal dan waktu saat ini
-from pathlib import Path  # Untuk manipulasi path (lokasi folder/file) secara modern & lintas OS
+from pathlib import (
+    Path,  # Untuk manipulasi path (lokasi folder/file) secara modern & lintas OS
+)
 from typing import (
     Optional,
     TypeVar,
@@ -87,12 +89,12 @@ if deepseek_key:
         api_key=deepseek_key,
         base_url="https://api.deepseek.com",  # Alamat server DeepSeek
     )
-    model = "deepseek-chat"  # Model utama DeepSeek (DeepSeek-V3)
+    model = "deepseek-flash"  # Model utama DeepSeek (DeepSeek-V3)
 elif openai_key:
     # Jika OPENAI_API_KEY ditemukan, gunakan endpoint resmi OpenAI:
     logger.info("Menggunakan provider: OpenAI API")
     client = OpenAI(api_key=openai_key)
-    model = "gpt-4o"  # Model utama OpenAI
+    model = "deepseek-flash"  # Model utama OpenAI
 else:
     # Jika kedua API key tidak ada, hentikan program dengan pesan peringatan:
     raise ValueError(
@@ -345,7 +347,6 @@ def process_calendar_request(user_input: str) -> Optional[EventConfirmation]:
 # Kode di dalam blok ini HANYA akan dijalankan jika file ini dieksekusi secara langsung
 # (misal: python 1-prompt-chaining.py), dan TIDAK akan otomatis jalan jika di-import oleh file lain.
 if __name__ == "__main__":
-
     print("\n" + "=" * 70)
     print("SKENARIO PENGUJIAN 1: INPUT JADWAL RAPAT VALID (HARUS SUKSES)")
     print("=" * 70)

@@ -4,6 +4,7 @@ This component implements retry logic, fallback processes, and error handling to
 """
 
 from typing import Optional
+
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -19,7 +20,7 @@ def resilient_intelligence(prompt: str) -> str:
 
     # Get structured output
     response = client.responses.parse(
-        model="gpt-4o",
+        model="deepseek-flash",
         input=[
             {"role": "system", "content": "Extract user information from the text."},
             {"role": "user", "content": prompt},

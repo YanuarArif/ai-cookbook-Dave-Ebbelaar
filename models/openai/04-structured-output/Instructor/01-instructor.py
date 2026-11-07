@@ -1,7 +1,8 @@
-import instructor
-from pydantic import BaseModel, Field
-from openai import OpenAI
 from enum import Enum
+
+import instructor
+from openai import OpenAI
+from pydantic import BaseModel, Field
 
 
 def send_reply(message: str):
@@ -14,7 +15,7 @@ def send_reply(message: str):
 
 # Patch the OpenAI client
 client = instructor.from_openai(OpenAI())
-MODEL = "gpt-4o-2024-08-06"
+MODEL = "deepseek-flash-2024-08-06"
 
 
 # Define your desired output structure using Pydantic

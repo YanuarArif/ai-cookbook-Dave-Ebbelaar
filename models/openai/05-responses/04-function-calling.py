@@ -21,7 +21,7 @@ tools = [
 ]
 
 response = client.responses.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     input="Can you send an email to ilan@example.com and katia@example.com saying hi?",
     tools=tools,
 )

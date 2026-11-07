@@ -15,7 +15,7 @@ def get_human_approval(content: str) -> bool:
 def intelligence_with_human_feedback(prompt: str) -> None:
     client = OpenAI()
 
-    response = client.responses.create(model="gpt-4o", input=prompt)
+    response = client.responses.create(model="deepseek-flash", input=prompt)
     draft_response = response.output_text
 
     if get_human_approval(draft_response):

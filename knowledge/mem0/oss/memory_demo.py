@@ -1,6 +1,6 @@
-from openai import OpenAI
-from mem0 import Memory
 from dotenv import load_dotenv
+from mem0 import Memory
+from openai import OpenAI
 
 load_dotenv("../.env")
 
@@ -30,7 +30,7 @@ def chat_with_memories(message: str, user_id: str = "default_user") -> str:
         {"role": "user", "content": message},
     ]
     response = openai_client.chat.completions.create(
-        model="gpt-4o-mini", messages=messages
+        model="deepseek-flash-mini", messages=messages
     )
     assistant_response = response.choices[0].message.content
 

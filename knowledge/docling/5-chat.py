@@ -1,7 +1,7 @@
-import streamlit as st
 import lancedb
-from openai import OpenAI
+import streamlit as st
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
@@ -80,7 +80,7 @@ def get_chat_response(messages, context: str) -> str:
 
     # Create the streaming response
     stream = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="deepseek-flash-mini",
         messages=messages_with_context,
         temperature=0.7,
         stream=True,

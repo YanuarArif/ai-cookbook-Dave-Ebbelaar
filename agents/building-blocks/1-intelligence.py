@@ -10,7 +10,7 @@ from openai import OpenAI
 
 def basic_intelligence(prompt: str) -> str:
     client = OpenAI()
-    response = client.responses.create(model="gpt-4o", input=prompt)
+    response = client.responses.create(model="deepseek-flash", input=prompt)
     return response.output_text
 
 

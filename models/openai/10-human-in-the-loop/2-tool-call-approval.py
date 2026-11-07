@@ -8,8 +8,9 @@ Run: python 2-tool-call-approval.py
 """
 
 import json
-from openai import OpenAI
+
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 
@@ -131,7 +132,7 @@ def run_with_approval(prompt: str) -> str:
                 "You are a helpful banking assistant. "
                 "You can check balances, list contacts, and transfer money."
             ),
-            model="gpt-4o",
+            model="deepseek-flash",
             temperature=0,
             input=messages,
             tools=tools,

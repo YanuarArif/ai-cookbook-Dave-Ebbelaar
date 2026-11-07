@@ -1,15 +1,16 @@
 import asyncio
 import json
 import sys
-from pathlib import Path
 from contextlib import AsyncExitStack
+from pathlib import Path
 from typing import Any, Dict, List
 
 import nest_asyncio
 from dotenv import load_dotenv
-from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from openai import AsyncOpenAI
+
+from mcp import ClientSession, StdioServerParameters
 
 # Apply nest_asyncio to allow nested event loops (needed for Jupyter/IPython)
 # Interactive cells have no __file__; open them from this lesson folder.
@@ -24,7 +25,7 @@ load_dotenv(SCRIPT_DIR.parent / ".env")
 session = None
 exit_stack = AsyncExitStack()
 openai_client = AsyncOpenAI()
-model = "gpt-4o"
+model = "deepseek-flash"
 stdio = None
 write = None
 

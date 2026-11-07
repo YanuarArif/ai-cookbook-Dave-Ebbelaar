@@ -55,7 +55,7 @@ messages = [
 ]
 
 completion = client.chat.completions.create(
-    model="gpt-4o",
+    model="deepseek-flash",
     messages=messages,
     tools=tools,
 )
@@ -97,7 +97,7 @@ class KBResponse(BaseModel):
 
 
 completion_2 = client.beta.chat.completions.parse(
-    model="gpt-4o",
+    model="deepseek-flash",
     messages=messages,
     tools=tools,
     response_format=KBResponse,
@@ -121,7 +121,7 @@ messages = [
 ]
 
 completion_3 = client.beta.chat.completions.parse(
-    model="gpt-4o",
+    model="deepseek-flash",
     messages=messages,
     tools=tools,
 )
