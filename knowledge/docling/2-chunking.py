@@ -6,7 +6,7 @@ from utils.tokenizer import OpenAITokenizerWrapper
 
 load_dotenv()
 
-# Initialize OpenAI client (make sure you have OPENAI_API_KEY in your environment variables)
+# Initialize OpenAI client (make sure you have DEEPSEEK_API_KEY in your environment variables)
 client = OpenAI()
 
 

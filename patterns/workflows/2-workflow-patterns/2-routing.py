@@ -1,8 +1,9 @@
-from typing import Optional, Literal
-from pydantic import BaseModel, Field
-from openai import OpenAI
-import os
 import logging
+import os
+from typing import Literal, Optional
+
+from openai import OpenAI
+from pydantic import BaseModel, Field
 
 # Set up logging configuration
 logging.basicConfig(
@@ -12,7 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
 model = "gpt-4o"
 
 # --------------------------------------------------------------

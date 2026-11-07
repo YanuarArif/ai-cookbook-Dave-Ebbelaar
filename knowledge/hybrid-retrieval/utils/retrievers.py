@@ -9,14 +9,15 @@ teach the construction, then the cleaned-up version graduates to a helper.
 
 import os
 from pathlib import Path
+
 import bm25s
 import numpy as np
 import pandas as pd
-from openai import OpenAI
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
 
 ROOT = Path(__file__).parent.parent
 DATA_DIR = ROOT / "data" / "fiqa"
@@ -42,7 +43,10 @@ class BM25Retriever:
     def search(self, query: str, k: int = 10) -> list[tuple[str, float]]:
         tokens = bm25s.tokenize([query], stopwords="en")
         indices, scores = self._retriever.retrieve(tokens, k=k)
-        return [(self._doc_ids[i], float(scores[0][j])) for j, i in enumerate(indices[0].tolist())]
+        return [
+            (self._doc_ids[i], float(scores[0][j]))
+            for j, i in enumerate(indices[0].tolist())
+        ]
 
 
 # --------------------------------------------------------------

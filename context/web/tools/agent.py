@@ -2,15 +2,15 @@ import json
 import os
 from typing import List
 
+from dotenv import load_dotenv
 from openai import OpenAI
 
-from dotenv import load_dotenv
-
-from .get_web_page import get_web_page, get_tool_definition as get_web_page_tool
+from .get_web_page import get_tool_definition as get_web_page_tool
+from .get_web_page import get_web_page
 from .models import AgentAnswer
-from .search_handbook import search_handbook, get_tool_definition as get_handbook_tool
+from .search_handbook import get_tool_definition as get_handbook_tool
+from .search_handbook import search_handbook
 from .web_search import get_tool_definition as get_web_search_tool
-
 
 DEFAULT_SYSTEM_PROMPT = """You are a research assistant for Dutch government organizations. You can help answer questions by:
 1. Searching the AI implementation handbook (for policy questions)
@@ -30,7 +30,7 @@ class SearchAgent:
         verbose: bool = True,
     ):
         load_dotenv()
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
         self.model = model
         self.verbose = verbose
         self.conversation_history: List[dict] = []

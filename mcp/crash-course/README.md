@@ -52,7 +52,7 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Keep this environment active in each terminal. For the interactive Python workflow shown in the video, select this environment as your kernel and set the working directory to the numbered lesson folder before running cells. Sections 4 and 5 need `OPENAI_API_KEY` in `mcp/crash-course/.env` (copy `.env.example` without overwriting an existing file). The calculator examples need no API key.
+Keep this environment active in each terminal. For the interactive Python workflow shown in the video, select this environment as your kernel and set the working directory to the numbered lesson folder before running cells. Sections 4 and 5 need `DEEPSEEK_API_KEY` in `mcp/crash-course/.env` (copy `.env.example` without overwriting an existing file). The calculator examples need no API key.
 
 ```bash
 python 3-simple-server-setup/client-stdio.py

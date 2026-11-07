@@ -1,4 +1,4 @@
 from openai import OpenAI
 
-# The OpenAI class will automatically use the OPENAI_API_KEY environment variable
+# The OpenAI class will automatically use the DEEPSEEK_API_KEY environment variable
 client = OpenAI()

@@ -12,14 +12,15 @@ More info: https://platform.openai.com/docs/guides/embeddings
 
 import os
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from openai import OpenAI
 from dotenv import load_dotenv
+from openai import OpenAI
 from tqdm import tqdm
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
 model = "text-embedding-3-small"
 
 DATA_DIR = Path(__file__).parent / "data" / "fiqa"

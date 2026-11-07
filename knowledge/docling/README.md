@@ -31,7 +31,7 @@ pip install -r requirements.txt
 2. Set up your environment variables by creating a `.env` file:
 
 ```bash
-OPENAI_API_KEY=your_api_key_here
+DEEPSEEK_API_KEY=your_api_key_here
 ```
 
 ### Running the Example

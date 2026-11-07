@@ -4,7 +4,7 @@ import os
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
 
 """
 docs: https://platform.openai.com/docs/guides/function-calling

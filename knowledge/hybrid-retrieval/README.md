@@ -70,7 +70,7 @@ uv run knowledge/hybrid-retrieval/6-evaluate.py
 
 You need two API keys in `.env`:
 
-- `OPENAI_API_KEY` for embeddings
+- `DEEPSEEK_API_KEY` for embeddings
 - `COHERE_API_KEY` for the reranker. The trial tier gives 1,000 free calls a month ([Cohere trial pricing](https://docs.cohere.com/docs/rate-limits))
 
 ## Where these recommendations come from
