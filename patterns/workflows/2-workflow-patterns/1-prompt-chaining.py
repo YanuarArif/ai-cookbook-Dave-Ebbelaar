@@ -84,17 +84,17 @@ openai_key = os.getenv("OPENAI_API_KEY")
 # Logika pemilihan provider secara otomatis:
 if deepseek_key:
     # Jika DEEPSEEK_API_KEY ditemukan, gunakan endpoint DeepSeek:
-    logger.info("Menggunakan provider: DeepSeek API")
+    logger.info("Menggunakan provider: DeepSeek API (model: deepseek-flash)")
     client = OpenAI(
         api_key=deepseek_key,
         base_url="https://api.deepseek.com",  # Alamat server DeepSeek
     )
-    model = "deepseek-flash"  # Model utama DeepSeek (DeepSeek-V3)
+    model = "deepseek-flash"  # Menggunakan model deepseek-flash sesuai permintaan
 elif openai_key:
     # Jika OPENAI_API_KEY ditemukan, gunakan endpoint resmi OpenAI:
-    logger.info("Menggunakan provider: OpenAI API")
+    logger.info("Menggunakan provider: OpenAI API (model: gpt-4o)")
     client = OpenAI(api_key=openai_key)
-    model = "deepseek-flash"  # Model utama OpenAI
+    model = "gpt-4o"
 else:
     # Jika kedua API key tidak ada, hentikan program dengan pesan peringatan:
     raise ValueError(

@@ -1,105 +1,254 @@
-import logging
-import os
-from typing import Literal, Optional
+"""
+================================================================================
+POLA WORKFLOW LLM: ROUTING (PERCABANGAN TUGAS CERDAS)
+================================================================================
+File ini mendemonstrasikan pola "Routing" (perutean/pengalihan tugas) dalam sistem LLM.
 
-from openai import OpenAI
-from pydantic import BaseModel, Field
+Konsep Utama:
+1. LLM Router: Model pertama bertindak sebagai "resepsionis / dispatcher" yang
+   menganalisis niat pengguna dan mengklasifikasikan jenis permintaan (new_event,
+   modify_event, atau other).
+2. Specialized Handlers: Setelah kategori diketahui, permintaan diarahkan ke
+   fungsi penanganan khusus (handle_new_event atau handle_modify_event).
+3. Efisiensi & Fokus: Setiap handler memiliki instruksi (prompt) dan model data
+   yang spesifik, membuat sistem lebih akurat dan terisolasi dengan rapi.
+4. Multi-Provider: Otomatis mendeteksi DeepSeek API (deepseek-flash) atau OpenAI API (gpt-4o).
+================================================================================
+"""
 
-# Set up logging configuration
+# ==============================================================================
+# BAGIAN 1: IMPORT LIBRARY (MODUL BAWAAN DAN PIHAK KETIGA)
+# ==============================================================================
+
+import json  # Untuk memanipulasi format data JSON
+import logging  # Untuk mencatat riwayat eksekusi (log) ke terminal
+import os  # Untuk membaca environment variables dari OS
+import sys  # Untuk konfigurasi sistem dan encoding output terminal
+from pathlib import Path  # Untuk manipulasi path folder/file secara lintas OS
+from typing import (
+    Literal,
+    Optional,
+    TypeVar,
+)  # Literal (pilihan string tetap), Optional (bisa None), TypeVar (generik)
+
+from dotenv import (
+    find_dotenv,
+    load_dotenv,
+)  # Untuk membaca file rahasia/konfigurasi (.env)
+from openai import OpenAI  # Client resmi untuk memanggil API LLM (DeepSeek / OpenAI)
+from pydantic import (
+    BaseModel,
+    Field,
+)  # Untuk validasi tipe data dan skema output terstruktur
+
+# Menyetel encoding terminal agar aman menampilkan karakter UTF-8 di Windows:
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+# ==============================================================================
+# BAGIAN 2: MEMUAT ENVIRONMENT VARIABLES (.env)
+# ==============================================================================
+
+# Mencari lokasi file .env di root project (naik 2 tingkat folder dari posisi file ini):
+project_root = Path(__file__).resolve().parents[2]
+load_dotenv(project_root / ".env")
+load_dotenv(find_dotenv())  # Cadangan jika file dieksekusi dari lokasi lain
+
+# ==============================================================================
+# BAGIAN 3: KONFIGURASI LOGGING
+# ==============================================================================
+
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
+    level=logging.INFO,  # Level INFO menampilkan status proses yang sedang berjalan
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Format: Waktu - Level - Pesan
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
-client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"))
-model = "deepseek-flash"
+# ==============================================================================
+# BAGIAN 4: DETEKSI PENYEDIA API (DEEPSEEK ATAU OPENAI)
+# ==============================================================================
 
-# --------------------------------------------------------------
-# Step 1: Define the data models for routing and responses
-# --------------------------------------------------------------
+deepseek_key = os.getenv("DEEPSEEK_API_KEY")
+openai_key = os.getenv("OPENAI_API_KEY")
+
+if deepseek_key:
+    logger.info("Menggunakan provider: DeepSeek API (model: deepseek-flash)")
+    client = OpenAI(
+        api_key=deepseek_key,
+        base_url="https://api.deepseek.com",  # Endpoint resmi DeepSeek
+    )
+    model = "deepseek-flash"  # Menggunakan model deepseek-flash sesuai permintaan
+elif openai_key:
+    logger.info("Menggunakan provider: OpenAI API (model: gpt-4o)")
+    client = OpenAI(api_key=openai_key)
+    model = "gpt-4o"
+else:
+    raise ValueError(
+        "Tidak ditemukan API key! Harap isi DEEPSEEK_API_KEY atau OPENAI_API_KEY di file .env Anda."
+    )
+
+# ==============================================================================
+# BAGIAN 5: DEFINISI MODEL DATA (PYDANTIC SCHEMAS)
+# ==============================================================================
 
 
 class CalendarRequestType(BaseModel):
-    """Router LLM call: Determine the type of calendar request"""
+    """Hasil LLM Router: Mengklasifikasikan jenis permintaan kalender."""
 
+    # Literal membatasi nilai request_type HANYA boleh salah satu dari 3 pilihan berikut:
     request_type: Literal["new_event", "modify_event", "other"] = Field(
-        description="Type of calendar request being made"
+        description="Jenis permintaan: 'new_event' (buat baru), 'modify_event' (ubah jadwal lama), atau 'other' (bukan jadwal)"
     )
-    confidence_score: float = Field(description="Confidence score between 0 and 1")
-    description: str = Field(description="Cleaned description of the request")
+    confidence_score: float = Field(
+        description="Skor keyakinan model antara 0.0 (tidak yakin) sampai 1.0 (sangat yakin)"
+    )
+    description: str = Field(
+        description="Deskripsi bersih dan ringkas dari permintaan pengguna"
+    )
 
 
 class NewEventDetails(BaseModel):
-    """Details for creating a new event"""
+    """Hasil Handler: Rincian untuk membuat acara kalender baru."""
 
-    name: str = Field(description="Name of the event")
-    date: str = Field(description="Date and time of the event (ISO 8601)")
-    duration_minutes: int = Field(description="Duration in minutes")
-    participants: list[str] = Field(description="List of participants")
+    name: str = Field(description="Nama acara atau judul pertemuan")
+    date: str = Field(
+        description="Waktu dan tanggal acara dalam format ISO 8601 (contoh: 2026-11-10T14:00:00)"
+    )
+    duration_minutes: int = Field(
+        description="Estimasi durasi pertemuan dalam satuan menit"
+    )
+    participants: list[str] = Field(
+        description="Daftar nama orang-orang yang berpartisipasi"
+    )
 
 
 class Change(BaseModel):
-    """Details for changing an existing event"""
+    """Rincian perubahan spesifik untuk suatu bidang (field)."""
 
-    field: str = Field(description="Field to change")
-    new_value: str = Field(description="New value for the field")
+    field: str = Field(
+        description="Nama bidang yang diubah (misal: 'date', 'time', 'location')"
+    )
+    new_value: str = Field(description="Nilai baru untuk bidang tersebut")
 
 
 class ModifyEventDetails(BaseModel):
-    """Details for modifying an existing event"""
+    """Hasil Handler: Rincian untuk mengubah acara kalender yang sudah ada."""
 
     event_identifier: str = Field(
-        description="Description to identify the existing event"
+        description="Nama atau deskripsi untuk mengidentifikasi acara lama yang ingin diubah"
     )
-    changes: list[Change] = Field(description="List of changes to make")
-    participants_to_add: list[str] = Field(description="New participants to add")
-    participants_to_remove: list[str] = Field(description="Participants to remove")
+    changes: list[Change] = Field(
+        default_factory=list, description="Daftar rincian perubahan yang diminta"
+    )
+    participants_to_add: list[str] = Field(
+        default_factory=list, description="Daftar peserta baru yang ditambahkan"
+    )
+    participants_to_remove: list[str] = Field(
+        default_factory=list, description="Daftar peserta yang dihapus dari acara"
+    )
 
 
 class CalendarResponse(BaseModel):
-    """Final response format"""
+    """Format respon akhir yang dikembalikan ke pengguna."""
 
-    success: bool = Field(description="Whether the operation was successful")
-    message: str = Field(description="User-friendly response message")
-    calendar_link: Optional[str] = Field(description="Calendar link if applicable")
+    success: bool = Field(
+        description="Apakah operasi kalender berhasil diproses (True/False)"
+    )
+    message: str = Field(description="Pesan ramah untuk ditampilkan ke pengguna")
+    calendar_link: Optional[str] = Field(
+        default=None,
+        description="Tautan (URL) ke aplikasi kalender jika tersedia",
+    )
 
 
-# --------------------------------------------------------------
-# Step 2: Define the routing and processing functions
-# --------------------------------------------------------------
+# ==============================================================================
+# BAGIAN 6: FUNGSI BANTUAN UNTUK STRUCTURED OUTPUT (UNIVERSAL HELPER)
+# ==============================================================================
+
+T = TypeVar("T", bound=BaseModel)
+
+
+def get_structured_completion(
+    messages: list[dict],
+    response_model: type[T],
+) -> T:
+    """Menjembatani pemanggilan output terstruktur antara DeepSeek dan OpenAI.
+
+    - DeepSeek: Memerlukan mode `json_object`, schema diinjeksi ke system prompt,
+      dan diparse menggunakan `response_model.model_validate_json()`.
+    - OpenAI: Menggunakan endpoint bawaan `beta.chat.completions.parse()`.
+    """
+    is_deepseek = "deepseek.com" in str(client.base_url)
+
+    if is_deepseek:
+        schema_json = json.dumps(response_model.model_json_schema(), indent=2)
+        format_instruction = (
+            f"\n\nYou must respond strictly with a valid JSON object matching this schema:\n"
+            f"{schema_json}\n"
+            f"Ensure the output contains only the valid json string without additional commentary."
+        )
+
+        formatted_messages = [dict(m) for m in messages]
+        if formatted_messages and formatted_messages[0]["role"] == "system":
+            formatted_messages[0]["content"] += format_instruction
+        else:
+            formatted_messages.insert(
+                0, {"role": "system", "content": format_instruction}
+            )
+
+        completion = client.chat.completions.create(
+            model=model,
+            messages=formatted_messages,
+            response_format={"type": "json_object"},
+        )
+        content = (completion.choices[0].message.content or "").strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        elif content.startswith("```"):
+            content = content[3:]
+        if content.endswith("```"):
+            content = content[:-3]
+        return response_model.model_validate_json(content.strip())
+    else:
+        completion = client.beta.chat.completions.parse(
+            model=model,
+            messages=messages,
+            response_format=response_model,
+        )
+        return completion.choices[0].message.parsed
+
+
+# ==============================================================================
+# BAGIAN 7: FUNGSI ROUTER DAN PENANGAN KHUSUS (SPECIALIZED HANDLERS)
+# ==============================================================================
 
 
 def route_calendar_request(user_input: str) -> CalendarRequestType:
-    """Router LLM call to determine the type of calendar request"""
-    logger.info("Routing calendar request")
+    """Fungsi Router: Menganalisis niat pengguna dan menentukan rute penanganan."""
+    logger.info("Memulai router kalender untuk mengklasifikasikan niat pengguna...")
 
-    completion = client.beta.chat.completions.parse(
-        model=model,
+    result = get_structured_completion(
         messages=[
             {
                 "role": "system",
-                "content": "Determine if this is a request to create a new calendar event or modify an existing one.",
+                "content": "Determine if this is a request to create a new calendar event, modify an existing one, or other.",
             },
             {"role": "user", "content": user_input},
         ],
-        response_format=CalendarRequestType,
+        response_model=CalendarRequestType,
     )
-    result = completion.choices[0].message.parsed
     logger.info(
-        f"Request routed as: {result.request_type} with confidence: {result.confidence_score}"
+        f"Rute ditentukan: '{result.request_type}' (Tingkat Keyakinan: {result.confidence_score:.2f})"
     )
     return result
 
 
 def handle_new_event(description: str) -> CalendarResponse:
-    """Process a new event request"""
-    logger.info("Processing new event request")
+    """Handler Khusus 1: Memproses pembuatan acara kalender baru."""
+    logger.info("Mengarahkan ke: Handler Acara Baru (New Event Handler)...")
 
-    # Get event details
-    completion = client.beta.chat.completions.parse(
-        model=model,
+    details = get_structured_completion(
         messages=[
             {
                 "role": "system",
@@ -107,27 +256,27 @@ def handle_new_event(description: str) -> CalendarResponse:
             },
             {"role": "user", "content": description},
         ],
-        response_format=NewEventDetails,
+        response_model=NewEventDetails,
     )
-    details = completion.choices[0].message.parsed
 
-    logger.info(f"New event: {details.model_dump_json(indent=2)}")
+    logger.info(f"Detail acara baru berhasil diparsing: {details.name}")
 
-    # Generate response
+    # Membuat respon sukses pembuatan jadwal:
+    peserta = (
+        ", ".join(details.participants) if details.participants else "tanpa peserta"
+    )
     return CalendarResponse(
         success=True,
-        message=f"Created new event '{details.name}' for {details.date} with {', '.join(details.participants)}",
+        message=f"Berhasil membuat acara baru '{details.name}' pada {details.date} bersama {peserta}.",
         calendar_link=f"calendar://new?event={details.name}",
     )
 
 
 def handle_modify_event(description: str) -> CalendarResponse:
-    """Process an event modification request"""
-    logger.info("Processing event modification request")
+    """Handler Khusus 2: Memproses perubahan jadwal acara yang sudah ada."""
+    logger.info("Mengarahkan ke: Handler Perubahan Acara (Modify Event Handler)...")
 
-    # Get modification details
-    completion = client.beta.chat.completions.parse(
-        model=model,
+    details = get_structured_completion(
         messages=[
             {
                 "role": "system",
@@ -135,67 +284,96 @@ def handle_modify_event(description: str) -> CalendarResponse:
             },
             {"role": "user", "content": description},
         ],
-        response_format=ModifyEventDetails,
+        response_model=ModifyEventDetails,
     )
-    details = completion.choices[0].message.parsed
 
-    logger.info(f"Modified event: {details.model_dump_json(indent=2)}")
+    logger.info(
+        f"Detail perubahan acara berhasil diparsing untuk acara: {details.event_identifier}"
+    )
 
-    # Generate response
+    # Membuat respon sukses perubahan jadwal:
     return CalendarResponse(
         success=True,
-        message=f"Modified event '{details.event_identifier}' with the requested changes",
+        message=f"Berhasil mengubah acara '{details.event_identifier}' sesuai perubahan yang diminta.",
         calendar_link=f"calendar://modify?event={details.event_identifier}",
     )
 
 
-def process_calendar_request(user_input: str) -> Optional[CalendarResponse]:
-    """Main function implementing the routing workflow"""
-    logger.info("Processing calendar request")
+# ==============================================================================
+# BAGIAN 8: ORKESTRASI WORKFLOW ROUTING
+# ==============================================================================
 
-    # Route the request
+
+def process_calendar_request(user_input: str) -> Optional[CalendarResponse]:
+    """Fungsi Utama: Mengatur alur routing dari klasifikasi hingga eksekusi handler."""
+    logger.info("--- [MEMULAI PROSES ROUTING KALENDER] ---")
+
+    # 1. Jalankan LLM Router untuk mengidentifikasi jenis request:
     route_result = route_calendar_request(user_input)
 
-    # Check confidence threshold
+    # 2. Gate Check: Jika model tidak yakin (< 0.7), jangan lanjutkan:
     if route_result.confidence_score < 0.7:
-        logger.warning(f"Low confidence score: {route_result.confidence_score}")
+        logger.warning(
+            f"Skor keyakinan router terlalu rendah: {route_result.confidence_score:.2f}"
+        )
         return None
 
-    # Route to appropriate handler
+    # 3. Percabangan logika (Routing Logic) berdasarkan hasil klasifikasi:
     if route_result.request_type == "new_event":
         return handle_new_event(route_result.description)
     elif route_result.request_type == "modify_event":
         return handle_modify_event(route_result.description)
     else:
-        logger.warning("Request type not supported")
+        logger.warning(
+            f"Jenis permintaan '{route_result.request_type}' bukan operasi kalender yang didukung."
+        )
         return None
 
 
-# --------------------------------------------------------------
-# Step 3: Test with new event
-# --------------------------------------------------------------
+# ==============================================================================
+# BAGIAN 9: PENGUJIAN KODE (TEST RUNNER)
+# ==============================================================================
 
-new_event_input = "Let's schedule a team meeting next Tuesday at 2pm with Alice and Bob"
-result = process_calendar_request(new_event_input)
-if result:
-    print(f"Response: {result.message}")
+if __name__ == "__main__":
+    print("\n" + "=" * 70)
+    print("SKENARIO PENGUJIAN 1: PERMINTAAN BUAT ACARA BARU (NEW EVENT)")
+    print("=" * 70)
 
-# --------------------------------------------------------------
-# Step 4: Test with modify event
-# --------------------------------------------------------------
+    input_baru = (
+        "Let's schedule a team meeting next Tuesday at 2pm with Alice and Bob"
+    )
+    hasil_1 = process_calendar_request(input_baru)
+    if hasil_1:
+        print(f"[BERHASIL] Respon: {hasil_1.message}")
+        if hasil_1.calendar_link:
+            print(f"[INFO] Link: {hasil_1.calendar_link}")
+    else:
+        print("[GAGAL] Permintaan tidak dapat diproses.")
 
-modify_event_input = (
-    "Can you move the team meeting with Alice and Bob to Wednesday at 3pm instead?"
-)
-result = process_calendar_request(modify_event_input)
-if result:
-    print(f"Response: {result.message}")
+    print("\n" + "=" * 70)
+    print("SKENARIO PENGUJIAN 2: PERMINTAAN UBAH JADWAL LAMA (MODIFY EVENT)")
+    print("=" * 70)
 
-# --------------------------------------------------------------
-# Step 5: Test with invalid request
-# --------------------------------------------------------------
+    input_ubah = (
+        "Can you move the team meeting with Alice and Bob to Wednesday at 3pm instead?"
+    )
+    hasil_2 = process_calendar_request(input_ubah)
+    if hasil_2:
+        print(f"[BERHASIL] Respon: {hasil_2.message}")
+        if hasil_2.calendar_link:
+            print(f"[INFO] Link: {hasil_2.calendar_link}")
+    else:
+        print("[GAGAL] Permintaan tidak dapat diproses.")
 
-invalid_input = "What's the weather like today?"
-result = process_calendar_request(invalid_input)
-if not result:
-    print("Request not recognized as a calendar operation")
+    print("\n" + "=" * 70)
+    print("SKENARIO PENGUJIAN 3: PERMINTAAN DI LUAR KALENDER (OTHER / INVALID)")
+    print("=" * 70)
+
+    input_salah = "What's the weather like today?"
+    hasil_3 = process_calendar_request(input_salah)
+    if hasil_3:
+        print(f"[BERHASIL] Respon: {hasil_3.message}")
+    else:
+        print(
+            "[DITOLAK] Permintaan dikenali bukan sebagai operasi kalender (Rute 'other')."
+        )
